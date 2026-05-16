@@ -1,5 +1,5 @@
 package co.edu.uptc.parking.service;
 
-public class VehicleRepository {
+public class VehicleService {
 
 }

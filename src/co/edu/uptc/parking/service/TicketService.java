@@ -1,5 +1,5 @@
 package co.edu.uptc.parking.service;
 
-public class ClientRepository {
+public class TicketService {
 
 }

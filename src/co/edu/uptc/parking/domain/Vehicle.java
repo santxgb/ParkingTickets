@@ -119,7 +119,7 @@ public class Vehicle {
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.hash(brand);
+		return Objects.hash(licensePlate);
 	}
 	/**
 	 * {@inheritDoc}
@@ -133,7 +133,7 @@ public class Vehicle {
 		if (getClass() != obj.getClass())
 			return false;
 		Vehicle other = (Vehicle) obj;
-		return Objects.equals(brand, other.brand);
+		return Objects.equals(licensePlate, other.licensePlate);
 	}
 	/**
 	 * {@inheritDoc}
