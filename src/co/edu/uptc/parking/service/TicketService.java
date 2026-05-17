@@ -43,5 +43,17 @@ public class TicketService {
 		return ticketRepository.existsById(ticketId);
 	}
 	
-	//Falta hacer el método de calcular el valor total
+	public double calcularValorTotal(Ticket ticket, double ratePerHour) {
+	    int entryHour = ticket.getEntryTime().getHour();
+	    int exitHour = ticket.getExitTime().getHour();
+	    int entryMinute = ticket.getEntryTime().getMinute();
+	    int exitMinute = ticket.getExitTime().getMinute();
+
+	    int totalMinutes = ((exitHour * 60) + exitMinute) - ((entryHour * 60) + entryMinute);
+	    double hours = Math.ceil(totalMinutes / 60.0);
+
+	    double surcharge = ticket.getVehicle().getTypeVehicle().getSurcharge();
+	    double base = hours * ratePerHour;
+	    return base + (base * surcharge);
+	}
 }
