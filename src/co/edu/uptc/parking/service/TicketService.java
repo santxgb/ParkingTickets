@@ -43,5 +43,5 @@ public class TicketService {
 		return ticketRepository.existsById(ticketId);
 	}
 	
-	
+	//Falta hacer el método de calcular el valor total
 }
