@@ -1,6 +1,7 @@
 package co.edu.uptc.parking.ui.controller;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import co.edu.uptc.parking.domain.Client;
 import co.edu.uptc.parking.domain.Ticket;
@@ -40,5 +41,26 @@ public class TicketController {
 		return ticketService.addTicket(ticket);
 	}
 	
+	public boolean registerExit(String ticketId, LocalDateTime exitTime, double ratePerHour) {
+		Ticket ticket = ticketService.findById(ticketId);
+		if(ticket == null) {
+			return false;
+		}
+		ticket.setExitTime(exitTime);
+		double total = ticketService.calcularValorTotal(ticket, ratePerHour);
+		ticket.setTotalValue(total);
+		return ticketService.updateTicket(ticket);
+	}
 	
+	public Ticket findTicketById(String ticketId) {
+		return ticketService.findById(ticketId);
+	}
+	
+	public List<Ticket> findAllTickets(){
+		return ticketService.findAll();
+	}
+	
+	public boolean deleteTicket(String ticketId) {
+		return ticketService.deleteTicket(ticketId);
+	}
 }

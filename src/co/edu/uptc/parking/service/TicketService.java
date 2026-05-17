@@ -35,6 +35,14 @@ public class TicketService {
 		return ticketRepository.findAll();
 	}
 	
+	public boolean updateTicket(Ticket ticket) {
+		if(!ticketRepository.existsById(ticket.getTicketId())) {
+			return false;
+		}
+		ticketRepository.add(ticket);
+		return true;
+	}
+	
 	public boolean deleteTicket(String ticketId) {
 		return ticketRepository.deleteById(ticketId);
 	}
