@@ -2,65 +2,132 @@ package co.edu.uptc.parking.ui.controller;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
 import co.edu.uptc.parking.domain.Client;
 import co.edu.uptc.parking.domain.Ticket;
 import co.edu.uptc.parking.domain.Vehicle;
+import co.edu.uptc.parking.dto.ResultDTO;
 import co.edu.uptc.parking.service.ClientService;
 import co.edu.uptc.parking.service.TicketService;
 import co.edu.uptc.parking.service.VehicleService;
 
 public class TicketController {
-	
-	private TicketService ticketService;
-	private ClientService clientService;
-	private VehicleService vehicleService;
-	/**
-	 * Crea una nueva instancia de TicketController.
-	 *
-	 * @param ticketService
-	 * @param clientService
-	 * @param vehicleService Parámetro que determina
-	 */
-	public TicketController() {
-		super();
-		this.ticketService = new TicketService();
-		this.clientService = new ClientService();
-		this.vehicleService = new VehicleService();
-	}
-	
-	public boolean registerEntry(String ticketId, String clientId, String licensePlate, LocalDateTime entryTime) {
-		Client client = clientService.findById(clientId);
-		Vehicle vehicle = vehicleService.findByLicensePlate(licensePlate);
-		
-		if(client == null || vehicle == null) {
-			return false;
-		}
-		
-		Ticket ticket = new Ticket(ticketId, entryTime, null, 0.0, vehicle, client);
-		return ticketService.addTicket(ticket);
-	}
-	
-	public boolean registerExit(String ticketId, LocalDateTime exitTime, double ratePerHour) {
-		Ticket ticket = ticketService.findById(ticketId);
-		if(ticket == null) {
-			return false;
-		}
-		ticket.setExitTime(exitTime);
-		double total = ticketService.calcularValorTotal(ticket, ratePerHour);
-		ticket.setTotalValue(total);
-		return ticketService.updateTicket(ticket);
-	}
-	
-	public Ticket findTicketById(String ticketId) {
-		return ticketService.findById(ticketId);
-	}
-	
-	public List<Ticket> findAllTickets(){
-		return ticketService.findAll();
-	}
-	
-	public boolean deleteTicket(String ticketId) {
-		return ticketService.deleteTicket(ticketId);
-	}
+
+    private TicketService ticketService;
+    private ClientService clientService;
+    private VehicleService vehicleService;
+
+    public TicketController() {
+        this.ticketService = new TicketService();
+        this.clientService = new ClientService();
+        this.vehicleService = new VehicleService();
+    }
+
+    public ResultDTO registerEntry(String ticketId, String clientId, String licensePlate, LocalDateTime entryTime) {
+        ResultDTO result = new ResultDTO();
+        result.setSuccessful(true);
+
+        // Validar campos requeridos
+        if (ticketId == null || ticketId.trim().isEmpty()) { 
+        	result.setSuccessful(false); result.getListMessageError().add("El ID del ticket no puede estar vacío."); }
+        if (clientId == null || clientId.trim().isEmpty()) { 
+        	result.setSuccessful(false); result.getListMessageError().add("El ID del cliente no puede estar vacío."); }
+        if (licensePlate == null || licensePlate.trim().isEmpty()) { 
+        	result.setSuccessful(false); result.getListMessageError().add("La placa no puede estar vacía."); }
+        if (entryTime == null) { result.setSuccessful(false); 
+        	result.getListMessageError().add("La hora de entrada no puede ser nula."); }
+        if (!result.isSuccessful()) 
+        	return result;
+
+        // Valida que cliente y vehículo existan
+        Client client = clientService.findById(clientId);
+        Vehicle vehicle = vehicleService.findByLicensePlate(licensePlate);
+        if (client  == null) { result.setSuccessful(false); 
+        result.getListMessageError().add("El cliente con ID " + clientId + " no existe.");
+        }
+        if (vehicle == null) { result.setSuccessful(false); 
+        result.getListMessageError().add("El vehículo con placa " + licensePlate + " no existe.");
+        }
+        if (!result.isSuccessful()) 
+        return result;
+
+        Ticket ticket = new Ticket(ticketId, entryTime, null, 0.0, vehicle, client);
+        boolean added = ticketService.addTicket(ticket);
+        if (!added) {
+            result.setSuccessful(false);
+            result.getListMessageError().add("Ya existe un ticket con el ID: " + ticketId);
+        } else {
+            result.setTicket(ticket);
+            result.setMessage("Entrada registrada correctamente.");
+        }
+        return result;
+    }
+
+    public ResultDTO registerExit(String ticketId, LocalDateTime exitTime, double ratePerHour) {
+        ResultDTO result = new ResultDTO();
+        result.setSuccessful(true);
+
+        if (ticketId == null || ticketId.trim().isEmpty()) { 
+        	result.setSuccessful(false); result.getListMessageError().add("El ID del ticket no puede estar vacío."); 
+        	return result; }
+        if (exitTime == null) { 
+        	result.setSuccessful(false); result.getListMessageError().add("La hora de salida no puede ser nula."); 
+        	return result; }
+        if (ratePerHour <= 0) { 
+        	result.setSuccessful(false); result.getListMessageError().add("La tarifa por hora debe ser mayor a 0."); 
+        	return result; }
+
+        Ticket ticket = ticketService.findById(ticketId);
+        if (ticket == null) {
+            result.setSuccessful(false);
+            result.getListMessageError().add("No se encontró el ticket con ID: " + ticketId);
+            return result;
+        }
+        ticket.setExitTime(exitTime);
+        double total = ticketService.calcularValorTotal(ticket, ratePerHour);
+        ticket.setTotalValue(total);
+        ticketService.updateTicket(ticket);
+        result.setTicket(ticket);
+        result.setMessage("Salida registrada. Total a pagar: $" + String.format("%.2f", total));
+        return result;
+    }
+
+    public ResultDTO findTicketById(String ticketId) {
+        ResultDTO result = new ResultDTO();
+        result.setSuccessful(true);
+        if (ticketId == null || ticketId.trim().isEmpty()) {
+            result.setSuccessful(false);
+            result.getListMessageError().add("El ID del ticket no puede estar vacío.");
+            return result;
+        }
+        Ticket ticket = ticketService.findById(ticketId);
+        if (ticket == null) {
+            result.setSuccessful(false);
+            result.getListMessageError().add("No se encontró el ticket con ID: " + ticketId);
+        } else {
+            result.setTicket(ticket);
+        }
+        return result;
+    }
+
+    public List<Ticket> findAllTickets() {
+        return ticketService.findAll();
+    }
+
+    public ResultDTO deleteTicket(String ticketId) {
+        ResultDTO result = new ResultDTO();
+        result.setSuccessful(true);
+        if (ticketId == null || ticketId.trim().isEmpty()) {
+            result.setSuccessful(false);
+            result.getListMessageError().add("El ID del ticket no puede estar vacío.");
+            return result;
+        }
+        boolean deleted = ticketService.deleteTicket(ticketId);
+        if (!deleted) {
+            result.setSuccessful(false);
+            result.getListMessageError().add("No se encontró el ticket con ID: " + ticketId);
+        } else {
+            result.setMessage("Ticket eliminado correctamente.");
+        }
+        return result;
+    }
 }
