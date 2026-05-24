@@ -24,7 +24,7 @@ public class Main {
                 case 2 -> vehicleView.showMenu();
                 case 3 -> ticketView.showMenu();
                 case 4 -> { running = false; 
-                JOptionPane.showMessageDialog(null, "Hasta luego"); 
+                JOptionPane.showMessageDialog(null, "Gracias por usar el sistema :D"); 
                 }
             }
         }

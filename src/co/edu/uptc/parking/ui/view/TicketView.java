@@ -1,7 +1,5 @@
 package co.edu.uptc.parking.ui.view;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import javax.swing.JOptionPane;
 import co.edu.uptc.parking.domain.Ticket;
@@ -11,7 +9,7 @@ import co.edu.uptc.parking.ui.controller.TicketController;
 public class TicketView {
 
     private TicketController ticketController;
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+   
 
     public TicketView() {
         this.ticketController = new TicketController();
@@ -43,33 +41,24 @@ public class TicketView {
         String ticketId = JOptionPane.showInputDialog("ID del ticket:");
         String clientId = JOptionPane.showInputDialog("ID del cliente:");
         String plate = JOptionPane.showInputDialog("Placa del vehículo:");
-        String entryStr = JOptionPane.showInputDialog("Hora de entrada (dd/MM/yyyy HH:mm):");
-        try {
-            LocalDateTime entryTime = LocalDateTime.parse(entryStr, FORMATTER);
-            ResultDTO result = ticketController.registerEntry(ticketId, clientId, plate, entryTime);
-            if (!result.isSuccessful()) { 
-            	showErrors("No se pudo registrar la entrada:", result); 
-            return; 
-            }
-            JOptionPane.showMessageDialog(null, result.getMessage());
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Formato de fecha inválido. Use dd/MM/yyyy HH:mm", "Error", JOptionPane.ERROR_MESSAGE);
-        }
+        String entry = JOptionPane.showInputDialog("Hora de entrada (dd/MM/yyyy HH:mm):");
+        ResultDTO result = ticketController.registerEntry(ticketId, clientId, plate, entry);
+        if (!result.isSuccessful()) { 
+        	showErrors("No se pudo registrar la entrada:", result); return; 
+        	}
+        JOptionPane.showMessageDialog(null, result.getMessage());
     }
 
     private void registerExit() {
         String ticketId = JOptionPane.showInputDialog("ID del ticket:");
-        String exitStr = JOptionPane.showInputDialog("Hora de salida (dd/MM/yyyy HH:mm):");
-        String rateStr = JOptionPane.showInputDialog("Tarifa por hora ($):");
-        try {
-            LocalDateTime exitTime = LocalDateTime.parse(exitStr, FORMATTER);
-            double rate = Double.parseDouble(rateStr);
-            ResultDTO result = ticketController.registerExit(ticketId, exitTime, rate);
-            if (!result.isSuccessful()) { showErrors("No se pudo registrar la salida:", result); return; }
-            JOptionPane.showMessageDialog(null, result.getMessage() + "\n\n" + result.getTicket().toString());
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Datos inválidos.", "Error", JOptionPane.ERROR_MESSAGE);
+        String exit = JOptionPane.showInputDialog("Hora de salida (dd/MM/yyyy HH:mm):");
+        String rate = JOptionPane.showInputDialog("Tarifa por hora ($):");
+        ResultDTO result = ticketController.registerExit(ticketId, exit, rate);
+        if (!result.isSuccessful()) { 
+        	showErrors("No se pudo registrar la salida:", result); 
+        return;
         }
+        JOptionPane.showMessageDialog(null, result.getMessage() + "\n\n" + result.getTicket().toString());
     }
 
     private void findAllTickets() {
