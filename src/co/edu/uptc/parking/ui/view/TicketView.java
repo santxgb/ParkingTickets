@@ -42,9 +42,11 @@ public class TicketView {
         String clientId = JOptionPane.showInputDialog("ID del cliente:");
         String plate = JOptionPane.showInputDialog("Placa del vehículo:");
         String entry = JOptionPane.showInputDialog("Hora de entrada (dd/MM/yyyy HH:mm):");
+
         ResultDTO result = ticketController.registerEntry(ticketId, clientId, plate, entry);
-        if (!result.isSuccessful()) { 
-        	showErrors("No se pudo registrar la entrada:", result); return; 
+        if (!result.isSuccessful()) {
+        	showErrors("No se pudo registrar la entrada:", result);
+        	return;
         	}
         JOptionPane.showMessageDialog(null, result.getMessage());
     }
@@ -53,11 +55,12 @@ public class TicketView {
         String ticketId = JOptionPane.showInputDialog("ID del ticket:");
         String exit = JOptionPane.showInputDialog("Hora de salida (dd/MM/yyyy HH:mm):");
         String rate = JOptionPane.showInputDialog("Tarifa por hora ($):");
+
         ResultDTO result = ticketController.registerExit(ticketId, exit, rate);
         if (!result.isSuccessful()) { 
-        	showErrors("No se pudo registrar la salida:", result); 
-        return;
-        }
+        	showErrors("No se pudo registrar la salida:", result);
+        	return;
+        	}
         JOptionPane.showMessageDialog(null, result.getMessage() + "\n\n" + result.getTicket().toString());
     }
 

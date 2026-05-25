@@ -22,87 +22,84 @@ public class TicketController {
         this.vehicleService = new VehicleService();
     }
 
-    public ResultDTO registerEntry(String ticketId, String clientId, String licensePlate, String entryTimeStr) {
+    public ResultDTO registerEntry(String ticketId, String clientId,
+            String licensePlate, String entryTimeStr) {
+    	ResultDTO result = new ResultDTO();
+    	result.setSuccessful(true);
+
+    	if (ticketId == null || ticketId.trim().isEmpty()) { 
+    		result.setSuccessful(false); result.getListMessageError().add("El ID del ticket no puede estar vacío.");
+			}
+    	if (clientId == null || clientId.trim().isEmpty()) { 
+    		result.setSuccessful(false); result.getListMessageError().add("El ID del cliente no puede estar vacío.");
+			}
+    	if (licensePlate == null || licensePlate.trim().isEmpty()) { 
+    		result.setSuccessful(false); result.getListMessageError().add("La placa no puede estar vacía.");
+			}
+    	if (entryTimeStr == null || entryTimeStr.trim().isEmpty()) { 
+    		result.setSuccessful(false); result.getListMessageError().add("La hora de entrada no puede estar vacía.");
+			}
+    	if (!result.isSuccessful()) 
+    		return result;
+    	// Validar formato de fecha con split 
+    	LocalDateTime entryTime = parseDateTime(entryTimeStr, result);
+    	if (!result.isSuccessful()) 
+    		return result;
+    	// Validar que cliente y vehículo existan
+    	Client  client  = clientService.findById(clientId);
+    	Vehicle vehicle = vehicleService.findByLicensePlate(licensePlate);
+    	if (client  == null) { result.setSuccessful(false); 
+			result.getListMessageError().add("El cliente con ID " + clientId + " no existe."); 
+			}
+    	if (vehicle == null) { result.setSuccessful(false); 
+			result.getListMessageError().add("El vehículo con placa " + licensePlate + " no existe.");
+			}
+    	if (!result.isSuccessful()) 
+    		return result;
+		Ticket ticket = new Ticket(ticketId, entryTime, null, 0.0, vehicle, client);
+		boolean added = ticketService.addTicket(ticket);
+		if (!added) {
+			result.setSuccessful(false);
+			result.getListMessageError().add("Ya existe un ticket con el ID: " + ticketId);
+			} else {
+			result.setTicket(ticket);
+			result.setMessage("Entrada registrada correctamente.");
+		}
+		return result;
+    }
+    public ResultDTO registerExit(String ticketId, String exitTimeStr, String rateStr) {
         ResultDTO result = new ResultDTO();
         result.setSuccessful(true);
 
         // Validar campos requeridos
         if (ticketId == null || ticketId.trim().isEmpty()) { 
-        	result.setSuccessful(false); result.getListMessageError().add("El ID del ticket no puede estar vacío."); 
-        	}
-        if (clientId == null || clientId.trim().isEmpty()) {
-        	result.setSuccessful(false); result.getListMessageError().add("El ID del cliente no puede estar vacío."); 
-        	}
-        if (licensePlate == null || licensePlate.trim().isEmpty()) { 
-        	result.setSuccessful(false); result.getListMessageError().add("La placa no puede estar vacía.");
-        	}
-        if (entryTimeStr == null || entryTimeStr.trim().isEmpty()) { 
-        	result.setSuccessful(false); result.getListMessageError().add("La hora de entrada no puede estar vacía.");
-        	}
-        if (!result.isSuccessful()) 
-        	return result;
-
-        if (!entryTimeStr.matches("^\\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2}$")) {
-            result.setSuccessful(false);
-            result.getListMessageError().add("Formato de fecha inválido. Use dd/MM/yyyy HH:mm");
-            return result;
-        }
-
-        LocalDateTime entryTime = parseDateTime(entryTimeStr);
-        Client  client  = clientService.findById(clientId);
-        Vehicle vehicle = vehicleService.findByLicensePlate(licensePlate);
-        	if (client  == null) { 
-        		result.setSuccessful(false); result.getListMessageError().add("El cliente con ID " + clientId + " no existe."); 
-        		}
-        	if (vehicle == null) { 
-        		result.setSuccessful(false); result.getListMessageError().add("El vehículo con placa " + licensePlate + " no existe."); 
-        		}
-        	if (!result.isSuccessful())
-        		return result;
-
-        Ticket ticket = new Ticket(ticketId, entryTime, null, 0.0, vehicle, client);
-        boolean added = ticketService.addTicket(ticket);
-        if (!added) {
-            result.setSuccessful(false);
-            result.getListMessageError().add("Ya existe un ticket con el ID: " + ticketId);
-        } else {
-            result.setTicket(ticket);
-            result.setMessage("Entrada registrada correctamente.");
-        }
-        return result;
-    }
-
-    public ResultDTO registerExit(String ticketId, String exitTimeStr, String rateStr) {
-        ResultDTO result = new ResultDTO();
-        result.setSuccessful(true);
-        if (ticketId == null || ticketId.trim().isEmpty()) { 
         	result.setSuccessful(false); result.getListMessageError().add("El ID del ticket no puede estar vacío.");
         	}
-        if (exitTimeStr == null || exitTimeStr.trim().isEmpty()) { 
+        if (exitTimeStr == null || exitTimeStr.trim().isEmpty()) {
         	result.setSuccessful(false); result.getListMessageError().add("La hora de salida no puede estar vacía.");
         	}
         if (rateStr == null || rateStr.trim().isEmpty()) { 
-        	result.setSuccessful(false); result.getListMessageError().add("La tarifa no puede estar vacía."); }
-        if (!result.isSuccessful()) 
-        	return result;
-        if (!exitTimeStr.matches("^\\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2}$")) {
-            result.setSuccessful(false);
-            result.getListMessageError().add("Formato de fecha inválido. Use dd/MM/yyyy HH:mm");
-            return result;
+        	result.setSuccessful(false); result.getListMessageError().add("La tarifa no puede estar vacía."); 
         	}
-        if (!rateStr.matches("^\\d+(\\.\\d+)?$")) {
+        if (!result.isSuccessful())
+        	return result;
+        // Validar formato de fecha
+        LocalDateTime exitTime = parseDateTime(exitTimeStr, result);
+        if (!result.isSuccessful()) return result;
+        // Validar que la tarifa sea un número mayor a 0
+        double ratePerHour = Double.parseDouble(rateStr);
+        if (ratePerHour <= 0) {
             result.setSuccessful(false);
-            result.getListMessageError().add("La tarifa debe ser un valor numérico positivo.");
+            result.getListMessageError().add("La tarifa debe ser mayor a 0.");
             return result;
         }
-        LocalDateTime exitTime    = parseDateTime(exitTimeStr);
-        double        ratePerHour = Double.parseDouble(rateStr);
+        // Buscar el ticket
         Ticket ticket = ticketService.findById(ticketId);
         if (ticket == null) {
             result.setSuccessful(false);
             result.getListMessageError().add("No se encontró el ticket con ID: " + ticketId);
             return result;
-        	}
+        }
         ticket.setExitTime(exitTime);
         double total = ticketService.calcularValorTotal(ticket, ratePerHour);
         ticket.setTotalValue(total);
@@ -146,22 +143,45 @@ public class TicketController {
         if (!deleted) {
             result.setSuccessful(false);
             result.getListMessageError().add("No se encontró el ticket con ID: " + ticketId);
-        } else {
+        	} else {
             result.setMessage("Ticket eliminado correctamente.");
         }
         return result;
     }
 
-    private LocalDateTime parseDateTime(String dateTimeStr) {
-        String[] parts     = dateTimeStr.split(" ");
-        String[] dateParts = parts[0].split("/");
-        String[] timeParts = parts[1].split(":");
-        return LocalDateTime.of(
-            Integer.parseInt(dateParts[2]),
-            Integer.parseInt(dateParts[1]),
-            Integer.parseInt(dateParts[0]),
-            Integer.parseInt(timeParts[0]),
-            Integer.parseInt(timeParts[1])
-        );
+    /**
+     * Parsea una fecha con formato dd/MM/yyyy HH:mm usando split.
+     * Valida la estructura antes de parsear.
+     * Si el formato es incorrecto agrega el error al ResultDTO.
+     */
+    private LocalDateTime parseDateTime(String dateTimeStr, ResultDTO result) {
+        // Separar fecha y hora por el espacio
+        String[] partes = dateTimeStr.split(" ");
+        if (partes.length != 2) {
+            result.setSuccessful(false);
+            result.getListMessageError().add("Formato de fecha inválido. Use dd/MM/yyyy HH:mm");
+            return null;
+        }
+        // Separar día, mes y año
+        String[] fecha = partes[0].split("/");
+        if (fecha.length != 3) {
+            result.setSuccessful(false);
+            result.getListMessageError().add("Formato de fecha inválido. Use dd/MM/yyyy HH:mm");
+            return null;
+        }
+        // Separar hora y minutos
+        String[] hora = partes[1].split(":");
+        if (hora.length != 2) {
+            result.setSuccessful(false);
+            result.getListMessageError().add("Formato de hora inválido. Use HH:mm");
+            return null;
+        }
+        // Construir el LocalDateTime con los valores separados
+        int dia = Integer.parseInt(fecha[0]);
+        int mes = Integer.parseInt(fecha[1]);
+        int anio = Integer.parseInt(fecha[2]);
+        int horas = Integer.parseInt(hora[0]);
+        int minutos = Integer.parseInt(hora[1]);
+        return LocalDateTime.of(anio, mes, dia, horas, minutos);
     }
 }
