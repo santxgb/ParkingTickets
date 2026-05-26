@@ -1,5 +1,6 @@
 package co.edu.uptc.parking.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import co.edu.uptc.parking.domain.Ticket;
@@ -52,12 +53,17 @@ public class TicketService {
 	}
 	
 	public double calcularValorTotal(Ticket ticket, double ratePerHour) {
-	    int entryHour = ticket.getEntryTime().getHour();
-	    int exitHour = ticket.getExitTime().getHour();
-	    int entryMinute = ticket.getEntryTime().getMinute();
-	    int exitMinute = ticket.getExitTime().getMinute();
+	    LocalDateTime entry = ticket.getEntryTime();
+	    LocalDateTime exit  = ticket.getExitTime();
 
-	    int totalMinutes = ((exitHour * 60) + exitMinute) - ((entryHour * 60) + entryMinute);
+	    long entryMinutesTotal = (long) entry.getDayOfYear() * 24 * 60
+	                           + entry.getHour() * 60
+	                           + entry.getMinute();
+	    long exitMinutesTotal  = (long) exit.getDayOfYear() * 24 * 60
+	                           + exit.getHour() * 60
+	                           + exit.getMinute();
+
+	    long totalMinutes = exitMinutesTotal - entryMinutesTotal;
 	    double hours = Math.ceil(totalMinutes / 60.0);
 
 	    double surcharge = ticket.getVehicle().getTypeVehicle().getSurcharge();

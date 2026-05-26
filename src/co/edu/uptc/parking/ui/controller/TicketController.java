@@ -71,35 +71,45 @@ public class TicketController {
         ResultDTO result = new ResultDTO();
         result.setSuccessful(true);
 
-        // Validar campos requeridos
-        if (ticketId == null || ticketId.trim().isEmpty()) { 
-        	result.setSuccessful(false); result.getListMessageError().add("El ID del ticket no puede estar vacío.");
-        	}
+        if (ticketId == null || ticketId.trim().isEmpty()) {
+            result.setSuccessful(false);
+            result.getListMessageError().add("El ID del ticket no puede estar vacío.");
+        }
         if (exitTimeStr == null || exitTimeStr.trim().isEmpty()) {
-        	result.setSuccessful(false); result.getListMessageError().add("La hora de salida no puede estar vacía.");
-        	}
-        if (rateStr == null || rateStr.trim().isEmpty()) { 
-        	result.setSuccessful(false); result.getListMessageError().add("La tarifa no puede estar vacía."); 
-        	}
-        if (!result.isSuccessful())
-        	return result;
-        // Validar formato de fecha
+            result.setSuccessful(false);
+            result.getListMessageError().add("La hora de salida no puede estar vacía.");
+        }
+        if (rateStr == null || rateStr.trim().isEmpty()) {
+            result.setSuccessful(false);
+            result.getListMessageError().add("La tarifa no puede estar vacía.");
+        }
+        if (!result.isSuccessful()) return result;
+
         LocalDateTime exitTime = parseDateTime(exitTimeStr, result);
         if (!result.isSuccessful()) return result;
-        // Validar que la tarifa sea un número mayor a 0
-        double ratePerHour = Double.parseDouble(rateStr);
-        if (ratePerHour <= 0) {
-            result.setSuccessful(false);
-            result.getListMessageError().add("La tarifa debe ser mayor a 0.");
-            return result;
-        }
-        // Buscar el ticket
+
+        // Buscar el ticket antes de validar fechas
         Ticket ticket = ticketService.findById(ticketId);
         if (ticket == null) {
             result.setSuccessful(false);
             result.getListMessageError().add("No se encontró el ticket con ID: " + ticketId);
             return result;
         }
+
+        // Validar que la salida sea posterior a la entrada
+        if (!exitTime.isAfter(ticket.getEntryTime())) {
+            result.setSuccessful(false);
+            result.getListMessageError().add("La hora de salida debe ser posterior a la hora de entrada.");
+            return result;
+        }
+
+        double ratePerHour = Double.parseDouble(rateStr);
+        if (ratePerHour <= 0) {
+            result.setSuccessful(false);
+            result.getListMessageError().add("La tarifa debe ser mayor a 0.");
+            return result;
+        }
+
         ticket.setExitTime(exitTime);
         double total = ticketService.calcularValorTotal(ticket, ratePerHour);
         ticket.setTotalValue(total);

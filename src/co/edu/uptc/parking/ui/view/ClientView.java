@@ -40,9 +40,9 @@ public class ClientView {
         String clientId = JOptionPane.showInputDialog("ID del cliente (3-15 caracteres alfanuméricos):");
         String name = JOptionPane.showInputDialog("Nombre (solo letras):");
         String lastName = JOptionPane.showInputDialog("Apellido (solo letras):");
-        String email = JOptionPane.showInputDialog("Email (formato válido):");
         String phone = JOptionPane.showInputDialog("Teléfono (7-15 dígitos):");
-        ResultDTO result = clientController.addClient(clientId, name, lastName, email, phone);
+        String email = JOptionPane.showInputDialog("Email (formato válido):");
+        ResultDTO result = clientController.addClient(clientId, name, lastName, phone, email);
         if (!result.isSuccessful()) {
             showErrors("No se pudo crear el cliente:", result);
             return;

@@ -59,17 +59,31 @@ public class VehicleController {
         return vehicleService.findAll();
     }
 
+ // DESPUÉS
     public ResultDTO updateVehicle(String licensePlate, String brand, String model, String color, TypeVehicleEnum typeVehicle) {
         ResultDTO result = new ResultDTO();
         result.setSuccessful(true);
-        if (brand != null && !brand.trim().isEmpty())
-            validateAlphanumericField("ValidationBrand", brand, "^[a-zA-ZÁÉÍÓÚáéíóúÑñ0-9 ]+$", result);
-        if (model != null && !model.trim().isEmpty())
-            validateAlphanumericField("ValidationModel", model, "^[a-zA-Z0-9 ]+$", result);
-        if (color != null && !color.trim().isEmpty())
-            validateAlphanumericField("ValidationColor", color, "^[a-zA-ZÁÉÍÓÚáéíóúÑñ ]+$", result);
+
+        Vehicle existing = vehicleService.findByLicensePlate(licensePlate);
+        if (existing == null) {
+            result.setSuccessful(false);
+            result.getListMessageError().add("No se encontró el vehículo con placa: " + licensePlate);
+            return result;
+        }
+
+        if (brand == null || brand.trim().isEmpty()) brand = existing.getBrand();
+        if (model == null || model.trim().isEmpty()) model = existing.getModel();
+        if (color == null || color.trim().isEmpty()) color = existing.getColor();
+        if (typeVehicle == null)                     typeVehicle = existing.getTypeVehicle();
+
+        validateAlphanumericField("ValidationBrand", brand, "^[a-zA-ZÁÉÍÓÚáéíóúÑñ0-9 ]+$", result);
+        validateAlphanumericField("ValidationModel", model, "^[a-zA-Z0-9 ]+$", result);
+        validateAlphanumericField("ValidationColor", color, "^[a-zA-ZÁÉÍÓÚáéíóúÑñ ]+$", result);
+
         if (!result.isSuccessful()) return result;
-        boolean updated = vehicleService.updateVehicle(new Vehicle(licensePlate, brand, model, color, typeVehicle));
+
+        boolean updated = vehicleService.updateVehicle(
+                new Vehicle(licensePlate, brand, model, color, typeVehicle));
         if (!updated) {
             result.setSuccessful(false);
             result.getListMessageError().add("No se encontró el vehículo con placa: " + licensePlate);
