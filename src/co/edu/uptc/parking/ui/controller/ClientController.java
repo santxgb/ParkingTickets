@@ -13,16 +13,17 @@ public class ClientController {
         this.clientService = new ClientService();
     }
 
-    public ResultDTO addClient(String clientId, String name, String lastName, String email, String phone) {
-        ResultDTO result = validateRequiredFields(clientId, name, lastName, email, phone);
+    public ResultDTO addClient(String clientId, String name, String lastName, String phone, String email) {
+        ResultDTO result = validateRequiredFields(clientId, name, lastName, phone, email);
         if (!result.isSuccessful()) 
         	return result;
 
         validateAlphanumericField("ValidationClientId", clientId, "^[A-Za-z0-9]{3,15}$", result);
         validateAlphanumericField("ValidationName", name, "^[a-zA-ZÁÉÍÓÚáéíóúÑñ ]+$", result);
         validateAlphanumericField("ValidationLastName", lastName, "^[a-zA-ZÁÉÍÓÚáéíóúÑñ ]+$", result);
-        validateAlphanumericField("ValidationEmail", email, "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$", result);
         validateAlphanumericField("ValidationPhone", phone, "^[0-9]{7,15}$", result);
+        validateAlphanumericField("ValidationEmail", email, "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$", result);
+        
         if (!result.isSuccessful()) return result;
 
         boolean added = clientService.addClient(new Client(clientId, name, lastName, email, phone));

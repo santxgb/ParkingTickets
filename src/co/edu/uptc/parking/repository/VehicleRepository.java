@@ -1,9 +1,10 @@
 package co.edu.uptc.parking.repository;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
+
 
 import co.edu.uptc.parking.domain.Vehicle;
 
@@ -18,7 +19,7 @@ public class VehicleRepository {
 	 */
 	public VehicleRepository() {
 		super();
-		this.vehicles = new TreeMap<>();
+		this.vehicles = new HashMap<>();
 	}
 	
 	public void add(Vehicle vehicle) {

@@ -161,7 +161,7 @@ public class TicketController {
             result.setSuccessful(false);
             result.getListMessageError().add("Formato de fecha inválido. Use dd/MM/yyyy HH:mm");
             return null;
-        }
+        } 
         // Separar día, mes y año
         String[] fecha = partes[0].split("/");
         if (fecha.length != 3) {
