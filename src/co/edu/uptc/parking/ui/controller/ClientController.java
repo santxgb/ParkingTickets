@@ -60,15 +60,28 @@ public class ClientController {
     public ResultDTO updateClient(String clientId, String name, String lastName, String email, String phone, String address){
         ResultDTO result = new ResultDTO();
         result.setSuccessful(true);
-        if (name     != null && !name.trim().isEmpty())
-            validateAlphanumericField("ValidationName",     name,     "^[a-zA-ZÁÉÍÓÚáéíóúÑñ ]+$", result);
-        if (lastName != null && !lastName.trim().isEmpty())
-            validateAlphanumericField("ValidationLastName", lastName, "^[a-zA-ZÁÉÍÓÚáéíóúÑñ ]+$", result);
-        if (email    != null && !email.trim().isEmpty())
-            validateAlphanumericField("ValidationEmail",    email,    "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$", result);
-        if (phone    != null && !phone.trim().isEmpty())
-            validateAlphanumericField("ValidationPhone",    phone,    "^[0-9]{7,15}$", result);
+
+        Client existing = clientService.findById(clientId);
+        if (existing == null) {
+            result.setSuccessful(false);
+            result.getListMessageError().add("No se encontró el cliente con ID: " + clientId);
+            return result;
+        }
+
+        if (name     == null || name.trim().isEmpty())     name     = existing.getName();
+        if (lastName == null || lastName.trim().isEmpty()) lastName = existing.getLastName();
+        if (email    == null || email.trim().isEmpty())    email    = existing.getEmail();
+        if (phone    == null || phone.trim().isEmpty())    phone    = existing.getPhone();
+        if (address  == null || address.trim().isEmpty())  address  = existing.getAddress();
+
+        validateAlphanumericField("ValidationName",     name,     "^[a-zA-ZÁÉÍÓÚáéíóúÑñ ]+$", result);
+        validateAlphanumericField("ValidationLastName", lastName, "^[a-zA-ZÁÉÍÓÚáéíóúÑñ ]+$", result);
+        validateAlphanumericField("ValidationEmail",    email,    "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$", result);
+        validateAlphanumericField("ValidationPhone",    phone,    "^[0-9]{7,15}$", result);
+        validateAlphanumericField("ValidationAddress",  address,  "^[a-zA-ZÁÉÍÓÚáéíóúÑñ0-9 #\\-\\.]+$", result);
+
         if (!result.isSuccessful()) return result;
+
         boolean updated = clientService.updateClient(new Client(clientId, name, lastName, phone, email, address));
         if (!updated) {
             result.setSuccessful(false);
