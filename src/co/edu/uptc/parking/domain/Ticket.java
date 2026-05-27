@@ -193,8 +193,12 @@ public class Ticket {
 	 */
 	@Override
 	public String toString() {
-		return "Ticket [ticketId=" + ticketId + ", totalValue=" + totalValue + ", vehicle=" + vehicle + ", client="
-				+ client + "]";
+	    return "Ticket [ticketId=" + ticketId 
+	            + ", entryTime=" + entryTime 
+	            + ", exitTime=" + (exitTime != null ? exitTime : "Sin registrar")
+	            + ", totalValue=" + totalValue 
+	            + ", vehicle=" + vehicle 
+	            + ", client=" + client + "]";
 	}
 	
 	

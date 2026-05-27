@@ -41,13 +41,13 @@ public class TicketRepository {
 		return tickets.containsKey(ticketId);
 	}
 	
-	public boolean hasOpenTicketForVehicle(String licensePlate) {
+	public List<Ticket> findByLicensePlate(String licensePlate) {
+	    List<Ticket> result = new ArrayList<>();
 	    for (Ticket ticket : tickets.values()) {
-	        if (ticket.getVehicle().getLicensePlate().equals(licensePlate)
-	                && ticket.getExitTime() == null) {
-	            return true;
+	        if (ticket.getVehicle().getLicensePlate().equals(licensePlate)) {
+	            result.add(ticket);
 	        }
 	    }
-	    return false;
+	    return result;
 	}
 }

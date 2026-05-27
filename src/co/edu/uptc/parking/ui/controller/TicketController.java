@@ -96,7 +96,6 @@ public class TicketController {
         LocalDateTime exitTime = parseDateTime(exitTimeStr, result);
         if (!result.isSuccessful()) return result;
 
-        // Buscar el ticket antes de validar fechas
         Ticket ticket = ticketService.findById(ticketId);
         if (ticket == null) {
             result.setSuccessful(false);
@@ -104,7 +103,13 @@ public class TicketController {
             return result;
         }
 
-        // Validar que la salida sea posterior a la entrada
+        if (ticketService.hasExitRegistered(ticketId)) {
+            result.setSuccessful(false);
+            result.getListMessageError().add("El ticket con ID " + ticketId 
+                + " ya tiene una salida registrada.");
+            return result;
+        }
+
         if (!exitTime.isAfter(ticket.getEntryTime())) {
             result.setSuccessful(false);
             result.getListMessageError().add("La hora de salida debe ser posterior a la hora de entrada.");

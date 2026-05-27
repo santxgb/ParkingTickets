@@ -53,7 +53,19 @@ public class TicketService {
 	}
 	
 	public boolean hasOpenTicketForVehicle(String licensePlate) {
-	    return ticketRepository.hasOpenTicketForVehicle(licensePlate);
+	    List<Ticket> vehicleTickets = ticketRepository.findByLicensePlate(licensePlate);
+	    for (Ticket ticket : vehicleTickets) {
+	        if (ticket.getExitTime() == null) {
+	            return true;
+	        }
+	    }
+	    return false;
+	}
+	
+	public boolean hasExitRegistered(String ticketId) {
+	    Ticket ticket = ticketRepository.findById(ticketId);
+	    if (ticket == null) return false;
+	    return ticket.getExitTime() != null;
 	}
 	
 	public double calcularValorTotal(Ticket ticket, double ratePerHour) {
