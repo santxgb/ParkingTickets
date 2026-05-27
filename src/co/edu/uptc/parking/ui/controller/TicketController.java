@@ -187,11 +187,37 @@ public class TicketController {
             return null;
         }
         // Construir el LocalDateTime con los valores separados
-        int dia = Integer.parseInt(fecha[0]);
-        int mes = Integer.parseInt(fecha[1]);
-        int anio = Integer.parseInt(fecha[2]);
-        int horas = Integer.parseInt(hora[0]);
+        int dia     = Integer.parseInt(fecha[0]);
+        int mes     = Integer.parseInt(fecha[1]);
+        int anio    = Integer.parseInt(fecha[2]);
+        int horas   = Integer.parseInt(hora[0]);
         int minutos = Integer.parseInt(hora[1]);
+
+        boolean rangoValido = true;
+        if (mes < 1 || mes > 12) {
+            result.setSuccessful(false);
+            result.getListMessageError().add("El mes debe estar entre 1 y 12.");
+            rangoValido = false;
+        }
+        if (dia < 1 || dia > 31) {
+            result.setSuccessful(false);
+            result.getListMessageError().add("El día debe estar entre 1 y 31.");
+            rangoValido = false;
+        }
+        if (horas < 0 || horas > 23) {
+            result.setSuccessful(false);
+            result.getListMessageError().add("La hora debe estar entre 0 y 23.");
+            rangoValido = false;
+        }
+        if (minutos < 0 || minutos > 59) {
+            result.setSuccessful(false);
+            result.getListMessageError().add("Los minutos deben estar entre 0 y 59.");
+            rangoValido = false;
+        }
+        if (!rangoValido) {
+        	return null;
+        }
+
         return LocalDateTime.of(anio, mes, dia, horas, minutos);
     }
 }
