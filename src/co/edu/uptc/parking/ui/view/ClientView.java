@@ -42,7 +42,8 @@ public class ClientView {
         String lastName = JOptionPane.showInputDialog("Apellido (solo letras):");
         String phone = JOptionPane.showInputDialog("Teléfono (7-15 dígitos):");
         String email = JOptionPane.showInputDialog("Email (formato válido):");
-        ResultDTO result = clientController.addClient(clientId, name, lastName, phone, email);
+        String address = JOptionPane.showInputDialog("Dirección:");
+        ResultDTO result = clientController.addClient(clientId, name, lastName, phone, email, address);
         if (!result.isSuccessful()) {
             showErrors("No se pudo crear el cliente:", result);
             return;
@@ -84,7 +85,8 @@ public class ClientView {
         String lastName = JOptionPane.showInputDialog("Apellido (" + existing.getLastName() + ") Enter para conservar:");
         String email = JOptionPane.showInputDialog("Email (" + existing.getEmail() + ") Enter para conservar:");
         String phone = JOptionPane.showInputDialog("Teléfono (" + existing.getPhone() + ") Enter para conservar:");
-        ResultDTO result = clientController.updateClient(id, name, lastName, email, phone);
+        String address = JOptionPane.showInputDialog("Dirección (" + existing.getAddress() + ") Enter para conservar:");
+        ResultDTO result = clientController.updateClient(id, name, lastName, email, phone, address);
         	if (!result.isSuccessful()) { 
         	showErrors("No se pudo actualizar:", result);
         	return; 

@@ -13,8 +13,8 @@ public class ClientController {
         this.clientService = new ClientService();
     }
 
-    public ResultDTO addClient(String clientId, String name, String lastName, String phone, String email) {
-        ResultDTO result = validateRequiredFields(clientId, name, lastName, phone, email);
+    public ResultDTO addClient(String clientId, String name, String lastName, String phone, String email, String address) {
+    	ResultDTO result = validateRequiredFields(clientId, name, lastName, phone, email, address);
         if (!result.isSuccessful()) 
         	return result;
 
@@ -23,10 +23,11 @@ public class ClientController {
         validateAlphanumericField("ValidationLastName", lastName, "^[a-zA-ZÁÉÍÓÚáéíóúÑñ ]+$", result);
         validateAlphanumericField("ValidationPhone", phone, "^[0-9]{7,15}$", result);
         validateAlphanumericField("ValidationEmail", email, "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$", result);
+        validateAlphanumericField("ValidationAddress", address, "^[a-zA-ZÁÉÍÓÚáéíóúÑñ0-9 #\\-\\.]+$", result);
         
         if (!result.isSuccessful()) return result;
 
-        boolean added = clientService.addClient(new Client(clientId, name, lastName, email, phone));
+        boolean added = clientService.addClient(new Client(clientId, name, lastName, phone, email, address));
         if (!added) {
             result.setSuccessful(false);
             result.getListMessageError().add("Ya existe un cliente con el ID: " + clientId);
@@ -56,8 +57,7 @@ public class ClientController {
         return clientService.findAll();
     }
 
-    public ResultDTO updateClient(String clientId, String name, String lastName,
-                                  String email, String phone) {
+    public ResultDTO updateClient(String clientId, String name, String lastName, String email, String phone, String address){
         ResultDTO result = new ResultDTO();
         result.setSuccessful(true);
         if (name     != null && !name.trim().isEmpty())
@@ -69,7 +69,7 @@ public class ClientController {
         if (phone    != null && !phone.trim().isEmpty())
             validateAlphanumericField("ValidationPhone",    phone,    "^[0-9]{7,15}$", result);
         if (!result.isSuccessful()) return result;
-        boolean updated = clientService.updateClient(new Client(clientId, name, lastName, email, phone));
+        boolean updated = clientService.updateClient(new Client(clientId, name, lastName, phone, email, address));
         if (!updated) {
             result.setSuccessful(false);
             result.getListMessageError().add("No se encontró el cliente con ID: " + clientId);
@@ -101,19 +101,28 @@ public class ClientController {
         return clientService.existsById(clientId);
     }
 
-    private ResultDTO validateRequiredFields(String clientId, String name, String lastName, String email, String phone) {
+    private ResultDTO validateRequiredFields(String clientId, String name, String lastName, String email, String phone, String address) {
         ResultDTO result = new ResultDTO();
         result.setSuccessful(true);
         if (clientId == null || clientId.trim().isEmpty()) { 
-        	result.setSuccessful(false); result.getListMessageError().add("El ID del cliente no puede ser nulo ni vacío."); }
+        	result.setSuccessful(false); result.getListMessageError().add("El ID del cliente no puede ser nulo ni vacío."); 
+        	}
         if (name == null || name.trim().isEmpty()) { 
-        	result.setSuccessful(false); result.getListMessageError().add("El nombre no puede ser nulo ni vacío."); }
+        	result.setSuccessful(false); result.getListMessageError().add("El nombre no puede ser nulo ni vacío."); 
+        	}
         if (lastName == null || lastName.trim().isEmpty()) { 
-        	result.setSuccessful(false); result.getListMessageError().add("El apellido no puede ser nulo ni vacío."); }
+        	result.setSuccessful(false); result.getListMessageError().add("El apellido no puede ser nulo ni vacío."); 
+        	}
         if (email == null || email.trim().isEmpty()){ 
-        	result.setSuccessful(false); result.getListMessageError().add("El email no puede ser nulo ni vacío."); }
+        	result.setSuccessful(false); result.getListMessageError().add("El email no puede ser nulo ni vacío."); 
+        	}
         if (phone == null || phone.trim().isEmpty()) { 
-        	result.setSuccessful(false); result.getListMessageError().add("El teléfono no puede ser nulo ni vacío."); }
+        	result.setSuccessful(false); result.getListMessageError().add("El teléfono no puede ser nulo ni vacío."); 
+        	}
+        if (address == null || address.trim().isEmpty()) {
+            result.setSuccessful(false);
+            result.getListMessageError().add("La dirección no puede ser nula ni vacía.");
+        }
         return result;
     }
 

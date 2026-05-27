@@ -8,6 +8,8 @@ public class Client {
 	private String lastName;
 	private String phone;
 	private String email;
+	private String address;
+	
 	/**
 	 * Crea una nueva instancia de Client.
 	 * Parámetro que determina
@@ -23,13 +25,14 @@ public class Client {
 	 * @param lastName
 	 * @param email Parámetro que determina
 	 */
-	public Client(String clientId, String name, String lastName, String phone, String email) {
+	public Client(String clientId, String name, String lastName, String phone, String email, String address) {
 		super();
 		this.clientId = clientId;
 		this.name = name;
 		this.lastName = lastName;
 		this.phone = phone;
 		this.email = email;
+		this.address = address;
 	}
 	/**
 	 * Método encargado de retornar el valor de clientId.
@@ -112,6 +115,23 @@ public class Client {
 	public void setEmail(String email) {
 		this.email = email;
 	}
+	
+	/**
+	 * Método encargado de retornar el valor de address.
+	 *
+	 * @return valor de address
+	 */
+	public String getAddress() {
+		return address;
+	}
+	/**
+	 * Método encargado de establecer el valor de address.
+	 *
+	 * @param address nuevo valor de address
+	 */
+	public void setAddress(String address) {
+		this.address = address;
+	}
 	/**
 	 * {@inheritDoc}
 	 */
@@ -139,7 +159,7 @@ public class Client {
 	@Override
 	public String toString() {
 		return "Client [clientId=" + clientId + ", name=" + name + ", lastName=" + lastName + ", phone=" + phone
-				+ ", email=" + email + "]";
+		        + ", email=" + email + ", address=" + address + "]";
 	}
 	
 	
