@@ -40,4 +40,14 @@ public class TicketRepository {
 	public boolean existsById(String ticketId) {
 		return tickets.containsKey(ticketId);
 	}
+	
+	public boolean hasOpenTicketForVehicle(String licensePlate) {
+	    for (Ticket ticket : tickets.values()) {
+	        if (ticket.getVehicle().getLicensePlate().equals(licensePlate)
+	                && ticket.getExitTime() == null) {
+	            return true;
+	        }
+	    }
+	    return false;
+	}
 }

@@ -52,6 +52,10 @@ public class TicketService {
 		return ticketRepository.existsById(ticketId);
 	}
 	
+	public boolean hasOpenTicketForVehicle(String licensePlate) {
+	    return ticketRepository.hasOpenTicketForVehicle(licensePlate);
+	}
+	
 	public double calcularValorTotal(Ticket ticket, double ratePerHour) {
 	    LocalDateTime entry = ticket.getEntryTime();
 	    LocalDateTime exit  = ticket.getExitTime();

@@ -49,14 +49,22 @@ public class TicketController {
     	Client  client  = clientService.findById(clientId);
     	Vehicle vehicle = vehicleService.findByLicensePlate(licensePlate);
     	if (client  == null) { result.setSuccessful(false); 
-			result.getListMessageError().add("El cliente con ID " + clientId + " no existe."); 
-			}
-    	if (vehicle == null) { result.setSuccessful(false); 
-			result.getListMessageError().add("El vehículo con placa " + licensePlate + " no existe.");
-			}
-    	if (!result.isSuccessful()) 
-    		return result;
-		Ticket ticket = new Ticket(ticketId, entryTime, null, 0.0, vehicle, client);
+        result.getListMessageError().add("El cliente con ID " + clientId + " no existe."); 
+    }
+    if (vehicle == null) { result.setSuccessful(false); 
+        result.getListMessageError().add("El vehículo con placa " + licensePlate + " no existe.");
+    }
+    if (!result.isSuccessful()) 
+        return result;
+
+    if (ticketService.hasOpenTicketForVehicle(licensePlate)) {
+        result.setSuccessful(false);
+        result.getListMessageError().add("El vehículo con placa " + licensePlate 
+            + " ya tiene una entrada registrada sin salida.");
+        return result;
+    }
+
+    Ticket ticket = new Ticket(ticketId, entryTime, null, 0.0, vehicle, client);
 		boolean added = ticketService.addTicket(ticket);
 		if (!added) {
 			result.setSuccessful(false);
