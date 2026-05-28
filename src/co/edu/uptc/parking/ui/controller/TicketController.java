@@ -16,10 +16,10 @@ public class TicketController {
     private ClientService clientService;
     private VehicleService vehicleService;
 
-    public TicketController() {
-        this.ticketService = new TicketService();
-        this.clientService = new ClientService();
-        this.vehicleService = new VehicleService();
+    public TicketController(TicketService ticketService, ClientService clientService, VehicleService vehicleService) {
+        this.ticketService  = ticketService;
+        this.clientService  = clientService;
+        this.vehicleService = vehicleService;
     }
 
     public ResultDTO registerEntry(String ticketId, String clientId,
@@ -172,11 +172,6 @@ public class TicketController {
         return result;
     }
 
-    /**
-     * Parsea una fecha con formato dd/MM/yyyy HH:mm usando split.
-     * Valida la estructura antes de parsear.
-     * Si el formato es incorrecto agrega el error al ResultDTO.
-     */
     private LocalDateTime parseDateTime(String dateTimeStr, ResultDTO result) {
         // Separar fecha y hora por el espacio
         String[] partes = dateTimeStr.split(" ");

@@ -10,8 +10,8 @@ public class VehicleController {
 
     private VehicleService vehicleService;
 
-    public VehicleController() {
-        this.vehicleService = new VehicleService();
+    public VehicleController(VehicleService vehicleService) {
+        this.vehicleService = vehicleService;
     }
 
     public ResultDTO addVehicle(String licensePlate, String brand, String model, String color, TypeVehicleEnum typeVehicle) {
@@ -59,7 +59,6 @@ public class VehicleController {
         return vehicleService.findAll();
     }
 
- // DESPUÉS
     public ResultDTO updateVehicle(String licensePlate, String brand, String model, String color, TypeVehicleEnum typeVehicle) {
         ResultDTO result = new ResultDTO();
         result.setSuccessful(true);

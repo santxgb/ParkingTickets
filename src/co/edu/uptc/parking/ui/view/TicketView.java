@@ -11,8 +11,8 @@ public class TicketView {
     private TicketController ticketController;
    
 
-    public TicketView() {
-        this.ticketController = new TicketController();
+    public TicketView(TicketController ticketController) {
+        this.ticketController = ticketController;
     }
 
     public void showMenu() {

@@ -11,8 +11,8 @@ public class VehicleView {
 
     private VehicleController vehicleController;
 
-    public VehicleView() {
-        this.vehicleController = new VehicleController();
+    public VehicleView(VehicleController vehicleController) {
+        this.vehicleController = vehicleController;
     }
 
     public void showMenu() {

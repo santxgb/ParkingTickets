@@ -9,8 +9,8 @@ public class ClientController {
 
     private ClientService clientService;
 
-    public ClientController() {
-        this.clientService = new ClientService();
+    public ClientController(ClientService clientService) {
+        this.clientService = clientService;
     }
 
     public ResultDTO addClient(String clientId, String name, String lastName, String phone, String email, String address) {
@@ -114,7 +114,7 @@ public class ClientController {
         return clientService.existsById(clientId);
     }
 
-    private ResultDTO validateRequiredFields(String clientId, String name, String lastName, String email, String phone, String address) {
+    private ResultDTO validateRequiredFields(String clientId, String name, String lastName, String phone, String email, String address) {
         ResultDTO result = new ResultDTO();
         result.setSuccessful(true);
         if (clientId == null || clientId.trim().isEmpty()) { 

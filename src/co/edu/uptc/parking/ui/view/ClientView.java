@@ -10,8 +10,8 @@ public class ClientView {
 
     private ClientController clientController;
 
-    public ClientView() {
-        this.clientController = new ClientController();
+    public ClientView(ClientController clientController) {
+        this.clientController = clientController;
     }
 
     public void showMenu() {
@@ -104,7 +104,6 @@ public class ClientView {
         JOptionPane.showMessageDialog(null, result.getMessage());
     }
 
-    /** Muestra los errores del DTO en un JOptionPane de error. */
     private void showErrors(String title, ResultDTO result) {
         StringBuilder sb = new StringBuilder(title).append("\n\n");
         result.getListMessageError().forEach(e -> sb.append("• ").append(e).append("\n"));
