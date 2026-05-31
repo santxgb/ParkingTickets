@@ -23,16 +23,18 @@ public class TicketView {
                 + "[2] Registrar salida\n"
                 + "[3] Consultar todos\n"
                 + "[4] Consultar por ID\n"
-                + "[5] Eliminar\n"
-                + "[6] Volver",
+                + "[5] Actualizar\n"
+                + "[6] Eliminar\n"
+                + "[7] Volver",
                 "── TICKETS ──", JOptionPane.INFORMATION_MESSAGE));
             switch (op) {
                 case 1 -> registerEntry();
                 case 2 -> registerExit();
                 case 3 -> findAllTickets();
                 case 4 -> findTicketById();
-                case 5 -> deleteTicket();
-                case 6 -> running = false;
+                case 5 -> updateTicket();
+                case 6 -> deleteTicket();
+                case 7 -> running = false;
             }
         }
     }
@@ -83,6 +85,29 @@ public class TicketView {
         	return; 
         }
         JOptionPane.showMessageDialog(null, result.getTicket().toString());
+    }
+    
+    private void updateTicket() {
+        String id = JOptionPane.showInputDialog("ID del ticket a actualizar:");
+        ResultDTO findResult = ticketController.findTicketById(id);
+        if (!findResult.isSuccessful()) {
+            showErrors("Ticket no encontrado:", findResult);
+            return;
+        }
+        Ticket existing = findResult.getTicket();
+        String newClientId  = JOptionPane.showInputDialog(
+            "ID del cliente (" + existing.getClient().getClientId() + ") Enter para conservar:");
+        String newPlate     = JOptionPane.showInputDialog(
+            "Placa del vehículo (" + existing.getVehicle().getLicensePlate() + ") Enter para conservar:");
+        String newEntry     = JOptionPane.showInputDialog(
+            "Hora de entrada (" + existing.getEntryTime() + ") Enter para conservar (dd/MM/yyyy HH:mm):");
+ 
+        ResultDTO result = ticketController.updateTicket(id, newClientId, newPlate, newEntry);
+        if (!result.isSuccessful()) {
+            showErrors("No se pudo actualizar:", result);
+            return;
+        }
+        JOptionPane.showMessageDialog(null, result.getMessage());
     }
 
     private void deleteTicket() {

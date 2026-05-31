@@ -1,9 +1,9 @@
 package co.edu.uptc.parking.repository;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import co.edu.uptc.parking.domain.Client;
 
@@ -18,7 +18,7 @@ public class ClientRepository {
 	 */
 	public ClientRepository() {
 		super();
-		this.clients = new TreeMap<>();
+		this.clients = new HashMap<>();
 	}
 	
 	public void add(Client client) {

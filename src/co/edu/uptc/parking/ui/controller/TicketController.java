@@ -131,6 +131,51 @@ public class TicketController {
         result.setMessage("Salida registrada. Total a pagar: $" + String.format("%.2f", total));
         return result;
     }
+    
+    public ResultDTO updateTicket(String ticketId, String newClientId, String newLicensePlate, String newEntryTimeStr) {
+        ResultDTO result = new ResultDTO();
+        result.setSuccessful(true);
+ 
+        Ticket existing = ticketService.findById(ticketId);
+        if (existing == null) {
+            result.setSuccessful(false);
+            result.getListMessageError().add("No se encontró el ticket con ID: " + ticketId);
+            return result;
+        }
+ 
+        Client  client  = existing.getClient();
+        Vehicle vehicle = existing.getVehicle();
+        LocalDateTime entryTime = existing.getEntryTime();
+ 
+        if (newClientId != null && !newClientId.trim().isEmpty()) {
+            client = clientService.findById(newClientId);
+            if (client == null) {
+                result.setSuccessful(false);
+                result.getListMessageError().add("El cliente con ID " + newClientId + " no existe.");
+                return result;
+            }
+        }
+ 
+        if (newLicensePlate != null && !newLicensePlate.trim().isEmpty()) {
+            vehicle = vehicleService.findByLicensePlate(newLicensePlate);
+            if (vehicle == null) {
+                result.setSuccessful(false);
+                result.getListMessageError().add("El vehículo con placa " + newLicensePlate + " no existe.");
+                return result;
+            }
+        }
+ 
+        if (newEntryTimeStr != null && !newEntryTimeStr.trim().isEmpty()) {
+            entryTime = parseDateTime(newEntryTimeStr, result);
+            if (!result.isSuccessful()) return result;
+        }
+ 
+        Ticket updated = new Ticket(ticketId, entryTime, existing.getExitTime(), existing.getTotalValue(), vehicle, client);
+        ticketService.updateTicket(updated);
+        result.setTicket(updated);
+        result.setMessage("Ticket actualizado correctamente.");
+        return result;
+    }
 
     public ResultDTO findTicketById(String ticketId) {
         ResultDTO result = new ResultDTO();
